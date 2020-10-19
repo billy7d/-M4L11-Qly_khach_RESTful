@@ -2,10 +2,8 @@ package service;
 
 import model.Customer;
 
-import java.util.List;
-
 public interface CustomerService {
-    List<Customer> findAll();
+    Iterable<Customer> findAll();
 
     Customer findById(Integer id);
 

@@ -2,23 +2,24 @@ package service;
 
 import model.Customer;
 import org.springframework.beans.factory.annotation.Autowired;
-import repository.CustomerRepository;
+
+import repository.Repository;
 
 import java.util.List;
 
 public class CustomerServiceImpl implements CustomerService{
 
     @Autowired
-    private CustomerRepository customerRepository;
+    private Repository customerRepository;
 
     @Override
-    public List<Customer> findAll() {
+    public Iterable<Customer> findAll() {
         return customerRepository.findAll();
     }
 
     @Override
     public Customer findById(Integer id) {
-        return customerRepository.findById(id);
+        return (Customer) customerRepository.findOne(id);
     }
 
     @Override
@@ -28,6 +29,6 @@ public class CustomerServiceImpl implements CustomerService{
 
     @Override
     public void remove(Integer id) {
-        customerRepository.remove(id);
+        customerRepository.delete(id);
     }
 }

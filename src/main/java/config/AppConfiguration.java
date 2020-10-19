@@ -7,6 +7,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.JpaVendorAdapter;
@@ -16,8 +17,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
-import repository.CustomerRepository;
-import repository.CustomerRepositoryImpl;
+
+
 import service.CustomerService;
 import service.CustomerServiceImpl;
 
@@ -30,6 +31,7 @@ import java.util.Properties;
 @EnableWebMvc
 @ComponentScan("controller")
 @EnableTransactionManagement
+@EnableJpaRepositories("repository")
 public class AppConfiguration extends WebMvcConfigurerAdapter implements ApplicationContextAware {
 
     private ApplicationContext applicationContext;
@@ -39,17 +41,15 @@ public class AppConfiguration extends WebMvcConfigurerAdapter implements Applica
         this.applicationContext = applicationContext;
     }
 
-    @Bean
-    public CustomerRepository customerRepository(){
-        return new CustomerRepositoryImpl();
-    }
+//    @Bean
+//    public CustomerRepository customerRepository(){
+//        return new CustomerRepositoryImpl();
+//    }
 
     @Bean
     public CustomerService customerService(){
         return new CustomerServiceImpl();
     }
-
-    //JPA configuration
 
     @Bean
     @Qualifier(value = "entityManager")
@@ -92,4 +92,5 @@ public class AppConfiguration extends WebMvcConfigurerAdapter implements Applica
         properties.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQL5Dialect");
         return properties;
     }
+
 }

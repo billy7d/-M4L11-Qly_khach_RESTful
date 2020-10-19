@@ -22,12 +22,12 @@ public class CustomerController {
 
 
     @GetMapping( "/customers/")
-    public ResponseEntity<List<Customer>> listAllCustomers() {
-        List<Customer> customers = customerService.findAll();
-        if (customers.isEmpty()) {
-            return new ResponseEntity<List<Customer>>(HttpStatus.NO_CONTENT);//You many decide to return HttpStatus.NOT_FOUND
+    public ResponseEntity<Iterable<Customer>> listAllCustomers() {
+        Iterable<Customer> customers = customerService.findAll();
+        if (customers == null) {
+            return new ResponseEntity<Iterable<Customer>>(HttpStatus.NO_CONTENT);//You many decide to return HttpStatus.NOT_FOUND
         }
-        return new ResponseEntity<List<Customer>>(customers, HttpStatus.OK);
+        return new ResponseEntity<Iterable<Customer>>(customers, HttpStatus.OK);
     }
 
     //-------------------Retrieve Single Customer--------------------------------------------------------

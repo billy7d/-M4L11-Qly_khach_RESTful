@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th ="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+</head>
+<body>
+
+<form id="create" onclick="addCustomer()">
+    <input type="text" placeholder="input first name" id="firstName"/>
+    <input type="text" placeholder="input last name" id="lastName"/>
+    <input type="submit" value="Create"/>
+
+</form>
+
+<table>
+    <tr>
+        <th>ID</th>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Action</th>
+    </tr>
+    <tbody id="listCustomer">
+    <th:block th:each="c: ${customers}">
+    <tr>
+        <td th:text="${c.id}"></td>
+        <td th:text="${c.firstName}"></td>
+        <td th:text="${c.lastName}"></td>
+        <td><a th:href="@{/customers/__${c.id}__}">Edit</a></td>
+        <td><a th:href="@{/customers/__${c.id}__}" onclick="deleteCus()" id="delete">Delete</a></td>
+    </tr>
+    </th:block>
+    </tbody>
+</table>
+
+
+
+<script>
+    function addCustomer(){
+        let firstName = $('#firstName').val();
+        let lastName = $('#lastName').val();
+        let newCustomer = {
+            firstName: firstName,
+            lastName:lastName
+        }
+        $.ajax({
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            data: JSON.stringify(newCustomer),
+            type:'POST',
+            url:"/customers/",
+            success: showListCustomer("/customers/")
+        });
+        event.preventDefault();
+
+    }
+
+    function showListCustomer(url){
+        $.ajax({
+            type: 'GET',
+            url:url,
+            success: function (customer){
+                let content ="";
+                for (let i =0;i<customer.length;i++){
+                    content += `<tr>
+                         <td>${customer[i].id}</td>` +
+                        ` <td>${customer[i].firstName}</td>`+
+                        `<td>${customer[i].lastName}</td>
+                        </tr>`
+                }
+                $('#listCustomer').html(content);
+
+            }
+        });
+    }
+
+    function deleteCus(){
+        let id = $('#delete').attributes("href");
+        $.ajax({
+            url:"/customers/" + id,
+            type: "DELETE",
+
+            success: function (){
+                let deleteTarget = $('#delete').closest("tr");
+                deleteTarget.remove();
+            }
+        });
+        event.preventDefault();
+
+    }
+
+</script>
+
+</body>
+
+
+
+</html>

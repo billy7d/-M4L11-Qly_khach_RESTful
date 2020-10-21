@@ -1,13 +1,14 @@
 package service;
 
 import model.Customer;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface CustomerService {
-    List<Customer> findAll();
+public interface CustomerService  {
+    Iterable<Customer> findAll();
 
-    Customer findById(Integer id);
+    Customer findOne(Integer id);
 
     void save(Customer customer);
 

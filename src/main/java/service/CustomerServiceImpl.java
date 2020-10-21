@@ -12,14 +12,15 @@ public class CustomerServiceImpl implements CustomerService{
     private CustomerRepository customerRepository;
 
     @Override
-    public List<Customer> findAll() {
+    public Iterable<Customer> findAll() {
         return customerRepository.findAll();
     }
 
     @Override
-    public Customer findById(Integer id) {
-        return customerRepository.findById(id);
+    public Customer findOne(Integer id) {
+        return customerRepository.findOne(id);
     }
+
 
     @Override
     public void save(Customer customer) {
@@ -28,6 +29,6 @@ public class CustomerServiceImpl implements CustomerService{
 
     @Override
     public void remove(Integer id) {
-        customerRepository.remove(id);
+        customerRepository.delete(id);
     }
 }

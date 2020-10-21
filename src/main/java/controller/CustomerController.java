@@ -7,6 +7,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 import service.CustomerService;
@@ -20,22 +21,26 @@ public class CustomerController {
     private CustomerService customerService;
 
 
-
-    @GetMapping( "/customers/")
-    public ResponseEntity<List<Customer>> listAllCustomers() {
-        List<Customer> customers = customerService.findAll();
-        if (customers.isEmpty()) {
-            return new ResponseEntity<List<Customer>>(HttpStatus.NO_CONTENT);//You many decide to return HttpStatus.NOT_FOUND
-        }
-        return new ResponseEntity<List<Customer>>(customers, HttpStatus.OK);
+    @GetMapping("/list")
+    public String getList(Model model){
+        model.addAttribute("customers",customerService.findAll());
+        return "index";
     }
 
-    //-------------------Retrieve Single Customer--------------------------------------------------------
+    @GetMapping( "/customers/")
+    public ResponseEntity<Iterable<Customer>> listAllCustomers() {
+        Iterable<Customer> customers = customerService.findAll();
+        if (customers == null) {
+            return new ResponseEntity<Iterable<Customer>>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<Iterable<Customer>>(customers, HttpStatus.OK);
+    }
+
 
     @GetMapping( value = "/customers/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Customer> getCustomer(@PathVariable("id") Integer id) {
         System.out.println("Fetching Customer with id " + id);
-        Customer customer = customerService.findById(id);
+        Customer customer = customerService.findOne(id);
         if (customer == null) {
             System.out.println("Customer with id " + id + " not found");
             return new ResponseEntity<Customer>(HttpStatus.NOT_FOUND);
@@ -43,24 +48,22 @@ public class CustomerController {
         return new ResponseEntity<Customer>(customer, HttpStatus.OK);
     }
 
-    //-------------------Create a Customer--------------------------------------------------------
+
 
     @PostMapping( "/customers/")
-    public ResponseEntity<Void> createCustomer(@RequestBody Customer customer, UriComponentsBuilder ucBuilder) {
+    public ResponseEntity<Void> createCustomer(@RequestBody Customer customer) {
         System.out.println("Creating Customer " + customer.getLastName());
         customerService.save(customer);
-        HttpHeaders headers = new HttpHeaders();
-        headers.setLocation(ucBuilder.path("/customers/{id}").buildAndExpand(customer.getId()).toUri());
-        return new ResponseEntity<Void>(headers, HttpStatus.CREATED);
+        return new ResponseEntity<Void>(HttpStatus.CREATED);
     }
 
-    //------------------- Update a Customer --------------------------------------------------------
+
 
     @PutMapping("/customers/{id}")
     public ResponseEntity<Customer> updateCustomer(@PathVariable("id") Integer id, @RequestBody Customer customer) {
         System.out.println("Updating Customer " + id);
 
-        Customer currentCustomer = customerService.findById(id);
+        Customer currentCustomer = customerService.findOne(id);
 
         if (currentCustomer == null) {
             System.out.println("Customer with id " + id + " not found");
@@ -75,13 +78,12 @@ public class CustomerController {
         return new ResponseEntity<Customer>(currentCustomer, HttpStatus.OK);
     }
 
-    //------------------- Delete a Customer --------------------------------------------------------
 
     @DeleteMapping("/customers/{id}")
     public ResponseEntity<Customer> deleteCustomer(@PathVariable("id") Integer id) {
         System.out.println("Fetching & Deleting Customer with id " + id);
 
-        Customer customer = customerService.findById(id);
+        Customer customer = customerService.findOne(id);
         if (customer == null) {
             System.out.println("Unable to delete. Customer with id " + id + " not found");
             return new ResponseEntity<Customer>(HttpStatus.NOT_FOUND);

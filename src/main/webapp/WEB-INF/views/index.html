@@ -7,7 +7,7 @@
 </head>
 <body>
 
-<form id="create" onclick="addCustomer()">
+<form id="create" onsubmit="addCustomer()">
     <input type="text" placeholder="input first name" id="firstName"/>
     <input type="text" placeholder="input last name" id="lastName"/>
     <input type="submit" value="Create"/>
@@ -19,7 +19,7 @@
         <th>ID</th>
         <th>First Name</th>
         <th>Last Name</th>
-        <th>Action</th>
+        <th colspan="2">Action</th>
     </tr>
     <tbody id="listCustomer">
     <th:block th:each="c: ${customers}">
@@ -51,25 +51,39 @@
             },
             data: JSON.stringify(newCustomer),
             type:'POST',
-            url:"/customers/",
-            success: showListCustomer("/customers/")
+            success: function (){
+                showListCustomer();
+            },
+            error: function (err){
+                alert(err)
+            },
+            url:"/customers/"
+
         });
         event.preventDefault();
-
+    }
+    function loop(url){
+        for (let i = 0; i <10 ; i++) {
+            showListCustomer(url);
+        }
     }
 
-    function showListCustomer(url){
+    function showListCustomer(){
         $.ajax({
             type: 'GET',
-            url:url,
+            url:"/customers/",
             success: function (customer){
                 let content ="";
-                for (let i =0;i<customer.length;i++){
+                for (let i = 0; i< customer.length;i++){
                     content += `<tr>
                          <td>${customer[i].id}</td>` +
                         ` <td>${customer[i].firstName}</td>`+
-                        `<td>${customer[i].lastName}</td>
-                        </tr>`
+                        `<td>${customer[i].lastName}</td>` +
+                         `<td><a href="/customers/${customer[i].id}">Edit</a></td>`+
+                        `<td>
+                            <a onclick="deleteCus(${customer[i].id},event)" href="/customers/${customer[i].id}">Delete</a>
+                         </td>`+
+                        `</tr>`
                 }
                 $('#listCustomer').html(content);
 
@@ -77,20 +91,18 @@
         });
     }
 
-    function deleteCus(){
-        let id = $('#delete').attributes("href");
+    function deleteCus(id1,event){
+        let id = id1;
         $.ajax({
             url:"/customers/" + id,
             type: "DELETE",
-
             success: function (){
-                let deleteTarget = $('#delete').closest("tr");
-                deleteTarget.remove();
+                $(event.target).closest("tr").remove();
             }
         });
         event.preventDefault();
-
     }
+
 
 </script>
 
